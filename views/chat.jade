@@ -1,0 +1,60 @@
+extends layout
+
+block content
+    script.
+        angular.module('App', [])
+            .controller('apiCtrl', function ($scope, $http) {
+                var api = this;
+                api.messages=[];
+                api.getMessages = function (){
+                    $http.get("/api/messages")
+                        .then(function (response) {
+                            api.messages = response.data.messages;
+                        });
+                }
+                api.postMessage = function () {
+                    $http.post("/api/messages",{message: $scope.inputMessage})
+                        .then(function (response) {
+                            console.log(response.data);
+                            api.messages.push(response.data.message);
+                            console.log(api.messages);
+                        })
+                }
+                api.deleteMessage = function(id, index) {
+                    $http.delete("/api/messages/"+id)
+                        .then(function (response) {
+                            console.log(response);
+                            api.messages.splice(index,1);
+                        })
+                }
+                api.editMessage = function (id, mes) {
+                    $http.put("/api/messages/" + id, {message: mes})
+                        .then(function (response) {
+                            console.log(response);
+                        })
+                }
+        });
+
+    nav.nav
+        div.nav-right
+            a(href="/login/logout").nav-item Logout
+    div.content
+        div(ng-app="App" ng-controller="apiCtrl as mApi")
+            button(ng-click="mApi.getMessages()").button Get
+
+
+
+            table.table
+                thead.thead
+                    th.th
+                        input(type="text", ng-model="inputMessage").input
+                    th.th
+                        button(ng-click="mApi.postMessage()").button Post
+                    th.th
+                tr.tr(ng-repeat="message in mApi.messages")
+                    td.td
+                        input(value="{{ message.message }}", ng-model="message.message").input
+                    td.td
+                        button(ng-click="mApi.editMessage(message._id, message.message)").button Edit
+                    td.td
+                        button(ng-click="mApi.deleteMessage(message._id, $index)").button Delete

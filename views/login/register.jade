@@ -1,0 +1,21 @@
+extends ../layout
+
+block content
+    nav.nav
+        div.nav-right
+            a(href='/login').nav-item LogIn
+            a(href='login/register').nav-item Register
+    div.columns
+        div.column.is-one-third
+            if error
+                div.notification.is-danger
+                    button.delete
+                    span #{error}
+            form(action="/login/register" method="post")
+                label.label Login
+                        input(name="login").input
+                label.label password
+                        input(name="password").input
+                label.label repeat password
+                        input(name="confirm").input
+                input(type='submit').button.is-medium
